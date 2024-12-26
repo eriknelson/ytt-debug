@@ -10,9 +10,15 @@ for my needs.
 
 # Current layout
 
-Project that is stripped down to the core elements of the question:
+Project that is stripped down to the core elements of the question with a
+reproducible case.
 
-[link](#)
+[link](https://github.com/eriknelson/ytt-debug)
+
+`make coredns-manifest` is what I'm hoping to be my complete target.
+
+`make _base-manifest` & `make _common-manifest` will each compile yaml fragments
+of each layer independently.
 
 ## Templates
 
