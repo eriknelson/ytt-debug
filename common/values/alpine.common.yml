@@ -1,0 +1,9 @@
+#@data/values
+---
+common_packages:
+  - curl
+  - wget
+  - vim
+  - bash
+  - htop
+  - net-tools

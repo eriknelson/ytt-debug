@@ -1,0 +1,16 @@
+#@ load("@ytt:data", "data")
+---
+image:
+  distribution: #@ data.values.distribution
+  release: #@ data.values.release
+  variant: #@ data.values.variant
+  architecture: #@ data.values.architecture
+
+source:
+  downloader: #@ data.values.source.downloader
+  url: #@ data.values.source.url
+  keys: #@ data.values.source.keys
+
+packages:
+  manager: #@ data.values.package_manager
+  update: true

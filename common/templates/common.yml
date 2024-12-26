@@ -1,0 +1,7 @@
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:data", "data")
+---
+#@overlay/match by=overlay.all
+packages:
+  sets:
+    - packages: #@ data.values.common_packages

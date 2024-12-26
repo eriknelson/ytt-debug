@@ -1,0 +1,24 @@
+#@ load("@ytt:template", "template")
+#@ load("/common/pkg/base.yml", "base_pkg")
+
+#@ def coredns_img():
+#@ return template.replace(base_pkg())
+---
+image:
+  name: primaris-coredns
+  description: CoreDNS server for Primaris infrastructure
+packages:
+  sets:
+    - packages:
+        - coredns
+      action: install
+#@ end
+
+#! actions:
+#!   - trigger: post-packages
+#!     action: |-
+#!       #!/bin/sh
+#!       mkdir -p /etc/coredns
+#!       cp /mnt/config/Corefile /etc/coredns/
+
+--- #@ coredns_img()

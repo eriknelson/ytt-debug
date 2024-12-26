@@ -1,0 +1,10 @@
+#@data/values
+---
+distribution: alpine
+release: "3.20"
+source:
+  downloader: alpinelinux
+  url: https://dl-cdn.alpinelinux.org/alpine
+  keys:
+    - 0482D84022F52DF1C4E7CD43293ACD0907D9495A
+package_manager: apk

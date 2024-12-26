@@ -1,0 +1,12 @@
+#@data/values-schema
+---
+distribution: ""
+release: ""
+variant: "default"
+architecture: "amd64"
+source:
+  downloader: ""
+  url: ""
+  keys:
+    - ""
+package_manager: ""
