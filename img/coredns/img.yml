@@ -1,8 +1,6 @@
-#@ load("@ytt:template", "template")
-#@ load("/common/pkg/base.yml", "base_pkg")
+#@ load("@ytt:overlay", "overlay")
 
-#@ def coredns_img():
-#@ return template.replace(base_pkg())
+#@overlay/match by=overlay.all
 ---
 image:
   name: primaris-coredns
@@ -12,13 +10,3 @@ packages:
     - packages:
         - coredns
       action: install
-#@ end
-
-#! actions:
-#!   - trigger: post-packages
-#!     action: |-
-#!       #!/bin/sh
-#!       mkdir -p /etc/coredns
-#!       cp /mnt/config/Corefile /etc/coredns/
-
---- #@ coredns_img()

@@ -7,7 +7,8 @@ coredns-manifest:
 		-f base/templates/distro.yml \
 		-f common/schema/common.yml \
 		-f common/values/alpine.common.yml \
-		-f common/templates/common.yml
+		-f common/templates/common.yml \
+		-f img/coredns/img.yml
 
 _common-manifest:
 	@ytt \

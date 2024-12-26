@@ -1,9 +1,10 @@
 #@data/values
 ---
 common_packages:
+  - bash
+  - vim
   - curl
   - wget
-  - vim
-  - bash
   - htop
   - net-tools
+  - bind-tools
