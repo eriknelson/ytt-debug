@@ -2,11 +2,14 @@
 
 #@overlay/match by=overlay.all
 ---
+#@overlay/match-child-defaults missing_ok=True
 image:
   name: primaris-coredns
   description: CoreDNS server for Primaris infrastructure
 packages:
   sets:
+    #@overlay/match by=overlay.all
     - packages:
         - coredns
+      #@overlay/match missing_ok=True
       action: install
