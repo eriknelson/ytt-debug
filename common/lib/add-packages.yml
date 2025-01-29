@@ -1,9 +1,10 @@
 #@ load("@ytt:overlay", "overlay")
 #@ load("@ytt:data", "data")
+#@ load("packages.lib.yml", "package_set")
 
 #@overlay/match by=overlay.all
 ---
 packages:
   #@overlay/match missing_ok=True
   sets:
-    - packages: #@ data.values.common_packages
+    - #@ package_set(packages=data.values.common_packages)

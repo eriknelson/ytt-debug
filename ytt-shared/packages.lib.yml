@@ -1,0 +1,28 @@
+#! packages.lib.yml 
+---
+
+#! package_set() yields a YAML Fragment of a mapping for one Package Set as described in:
+#!    https://github.com/lxc/distrobuilder/blob/7ff54966a579221644062b85b3689057e6899217/doc/examples/scheme.yaml#L134-L159
+#!   
+#@ def package_set(packages=[], action="install", flags=[], architectures=[], releases=[], types=[], variants=[], early=False):
+packages: #@ packages
+action: #@ action
+
+#@ if/end flags:
+flags: #@ flags
+
+#@ if/end architectures:
+architectures: #@ architectures
+
+#@ if/end releases:
+releases: #@ releases
+
+#@ if/end types:
+types: #@ types
+
+#@ if/end variants:
+variants: #@ variants
+
+#@ if/end early:
+early: #@ early
+#@ end
