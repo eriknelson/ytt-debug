@@ -6,10 +6,7 @@ image:
   variant: #@ data.values.variant
   architecture: #@ data.values.architecture
 
-source:
-  downloader: #@ data.values.source.downloader
-  url: #@ data.values.source.url
-  keys: #@ data.values.source.keys
+source: #@ data.values.source
 
 packages:
   manager: #@ data.values.package_manager
