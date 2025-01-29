@@ -9,4 +9,5 @@ image:
   description: CoreDNS server for Primaris infrastructure
 packages:
   sets:
-    - #@ package_set(["coredns"])
+    #@overlay/match by=overlay.index(0)
+    - #@ package_set(["coredns", "vim"])
