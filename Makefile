@@ -14,14 +14,14 @@ common-manifest: base-manifest
 	ytt \
 		-f ${BUILD_DIR}/base.yml \
 		-f ytt-shared/ \
-		-f common/lib \
+		-f common/config \
 		-f common/values/$(DISTRO).common.yml \
 		> ${BUILD_DIR}/common.yml
 
 base-manifest:
 	mkdir -p ${BUILD_DIR}
 	ytt \
-		-f base/lib \
+		-f base/config \
 		-f base/values/$(DISTRO).distro.yml \
 		> ${BUILD_DIR}/base.yml
 
