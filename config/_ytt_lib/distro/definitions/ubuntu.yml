@@ -1,0 +1,10 @@
+#@data/values
+---
+distro_definitions:
+  - distribution: ubuntu
+    source:
+      downloader: debootstrap
+      url: "http://archive.ubuntu.com/ubuntu"
+      keys:
+        - 871920D1991BC93C
+    package_manager: apt

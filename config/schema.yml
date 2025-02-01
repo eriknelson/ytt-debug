@@ -1,0 +1,28 @@
+#! config/schema.yml
+#!   Defines the total sets of inputs for building an LXC image manifest.
+#!
+#!   The `image` section is the base image manifest.
+#!   The `distro` section is the distribution-specific configuration.
+#!   The `additional_package_set_names` section is a list of package set names to be overlaid onto the base image manifest.
+
+#@data/values-schema
+---
+image:
+  #@schema/validation min_len=1
+  name: ""
+  #@schema/validation min_len=1
+  description: ""
+  #@schema/validation min_len=1
+  packages:
+    - ""
+
+distro:
+  #@schema/validation one_of=["alpine", "ubuntu"]
+  name: ""
+  #@schema/validation min_len=1
+  release: ""
+  #@schema/validation one_of=["amd64", "arm64"]
+  architecture: "amd64"
+
+additional_package_set_names:
+  - ""

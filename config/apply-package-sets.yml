@@ -1,0 +1,19 @@
+#! config/apply-package-sets.yml
+#!   Applies the configured package sets (0 to many) to the base image manifest.
+#!
+#!   The package sets are defined in the `package-sets` library.
+#!   (see `config/_ytt_lib/package-sets/template.yml` for the package set fragment)
+#!   (see also notes in `config/apply-distro.yml` for how this overlay-from-a-library idiom works)
+
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:library", "library")
+#@ load("@ytt:data", "data")
+
+#@ package_set_specs = [{"name": spec, "distro": data.values.distro.name} for spec in data.values.additional_package_set_names]
+
+#@ package_sets_overlay = library.get("package-sets").with_data_values({
+#@ "package_sets": package_set_specs
+#@ })
+
+#@overlay/match by=overlay.all
+--- #@ package_sets_overlay.eval()[0]

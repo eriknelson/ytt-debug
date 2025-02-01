@@ -1,0 +1,27 @@
+#! config/apply-distro.yml
+#!   Applies the distribution overlay to the base image manifest.
+#!
+#!   The distro fragment is produced by the `distro` library.
+#!   (see `config/_ytt_lib/distro/template.yml` for the fragment)
+
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:library", "library")
+#@ load("@ytt:data", "data")
+
+#@ distro_overlay = library.get("distro").with_data_values({
+#@   "distribution": data.values.distro.name,
+#@   "release": data.values.distro.release,
+#@   "architecture": data.values.distro.architecture,
+#@ })
+
+#! We're building an overlay: a YAML document that will be applied to the base image manifest.
+#! (rendered by `lxc-image-manifest.yml`).
+#!  - the `---` is the YAML document literal
+#!  - we're setting that document's contents to be the result of evaluating the `distro` library.
+#!    - the result is always a DocumentSet, even if only one document is produced; we're selecting the one and only document produced.
+#!  - it's the `#@overlay/match ...` annotation that turns this YAML document into an overlay.
+#!  - the `@overlay/match-child-defaults` annotation allows the overlay to add new keys as it overlays (would error out otherwise).
+
+#@overlay/match by=overlay.all
+#@overlay/match-child-defaults missing_ok=True
+--- #@ distro_overlay.eval()[0]
