@@ -1,0 +1,11 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:library", "library")
+
+#@ package_set = library.get("package-sets").export("package_set")
+---
+image:
+  name: #@ data.values.image.name
+  description: #@ data.values.image.description
+packages: 
+  sets:
+    - #@ package_set(data.values.image.packages)

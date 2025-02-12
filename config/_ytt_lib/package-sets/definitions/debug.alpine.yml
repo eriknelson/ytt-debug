@@ -1,0 +1,15 @@
+#@data/values
+---
+package_set_definitions:
+  - name: debug
+    distro: alpine
+    packages:
+      - tcpdump
+      - nmap
+      - traceroute
+      - iftop
+      - iproute2
+      - mtr
+      - netcat-openbsd
+      - dig
+      - ethtool

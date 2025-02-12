@@ -1,23 +1,15 @@
 .PHONY: coredns-img
 
-coredns-manifest:
-	ytt \
-		-f base/schema/distro.yml \
-		-f base/values/alpine.distro.yml \
-		-f base/templates/distro.yml \
-		-f common/schema/common.yml \
-		-f common/values/alpine.common.yml \
-		-f common/templates/common.yml \
-		-f img/coredns/img.yml
+coredns:
+	ytt -f config \
+		-f values/distro/alpine-3.20.yml \
+		-f values/image/coredns.yml \
+		-f values/package-sets/common.yml \
+		-f values/package-sets/debug.yml
 
-_common-manifest:
-	@ytt \
-		-f common/schema/common.yml \
-		-f common/values/alpine.common.yml \
-		-f common/templates/common.yml
+haproxy:
+	ytt -f config \
+		-f values/distro/ubuntu-noble.yml \
+		-f values/image/haproxy.yml \
+		-f values/package-sets/common.yml
 
-_base-manifest:
-	@ytt \
-		-f base/schema/distro.yml \
-		-f base/values/alpine.distro.yml \
-		-f base/templates/distro.yml

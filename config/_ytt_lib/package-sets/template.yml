@@ -1,0 +1,11 @@
+#@ load("@ytt:data", "data"); dv = data.values
+#@ load("package-set.lib.yml", "package_set")
+#@ load("definition_lookup.star", "package_sets")
+
+#@ package_sets = package_sets(dv.package_set_definitions, dv.package_sets)
+---
+packages:
+  sets:
+    #@ for set in package_sets:
+    - #@ package_set(set.packages)
+    #@ end

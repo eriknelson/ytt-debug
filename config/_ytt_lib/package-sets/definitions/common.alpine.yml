@@ -1,0 +1,13 @@
+#@data/values
+---
+package_set_definitions:
+  - name: common
+    distro: alpine
+    packages:
+      - bash
+      - vim
+      - curl
+      - wget
+      - htop
+      - net-tools
+      - bind-tools

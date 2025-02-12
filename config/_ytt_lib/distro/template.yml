@@ -1,0 +1,22 @@
+#! config/_ytt_lib/distro/template.yml
+#!   Produces the YAML fragment for a distribution.
+#!
+#!   Intended to be overlayed onto the base image manifest.
+#!   (see `config/apply-distro.yml` for the overlay)
+
+#@ load("@ytt:data", "data")
+#@ load("distro_lookup.star", "lookup_distro_definition")
+
+#@ distro_def = lookup_distro_definition(data.values.distro_definitions, data.values.distribution)
+---
+image:
+  distribution: #@ data.values.distribution
+  release: #@ data.values.release
+  variant: #@ data.values.variant
+  architecture: #@ data.values.architecture
+
+source: #@ distro_def.source
+
+packages:
+  manager: #@ distro_def.package_manager
+  update: true

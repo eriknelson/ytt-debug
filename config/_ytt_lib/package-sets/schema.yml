@@ -1,0 +1,12 @@
+#@data/values-schema
+---
+package_sets:
+  - name: ""
+    distro: ""
+
+package_set_definitions:
+  - name: ""
+    distro: ""
+    #! TODO: allow for nullable params for package_set()
+    packages:
+      - ""

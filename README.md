@@ -1,105 +1,173 @@
-# Use Case
+# LXC Images (using ytt Libraries)
 
-I'm working to build several different LXC based container images, which are
-defined with a yaml spec. Becuase I'll have a library of these images, often
-with a lot of shared configuration, I need a solution for building this shared
-library and the ultimate manifests while keeping things DRY. I'm used to
-kustomize and other templating solutions, but the real need here is just yaml,
-and I need something more sophisticated than yq. ytt looks like it is perfect
-for my needs.
+## Overview
 
-# Current layout
+This library produces YAML documents in the shape of LXC image manifests.
 
-Project that is stripped down to the core elements of the question with a
-reproducible case.
-
-[link](https://github.com/eriknelson/ytt-debug)
-
-`make coredns-manifest` is what I'm hoping to be my complete target.
-
-`make _base-manifest` & `make _common-manifest` will each compile yaml fragments
-of each layer independently.
-
-## Templates
-
-I'm having some trouble groking the idiomatic means of doing this with ytt
-and determining what the correct features would be to use to accomplish this
-(functions, modules, templates, or overlays)?
-
-This is not an issue that really has anything to do with distrobuilder, so
-anything to do with that is generally out of scope for this issue. Here's
-how I'm thinking about it:
-
-* **Base**: With LXC, there are a handful of base distros that can be utilized as the
-base of the image. The schema of its specification is the same, but the values
-differ, so I believe this is a natural fit for schema+values files, and
-templating.
-* **Common**: With each base image, I'm going to want some basic set of packages that are
-just my preference for working inside of the container, maybe I have some
-scripts I want to install etc.
-* **Workload**: This is the layer that brings in the specifics of the purpose
-of the image, usually configuration and the specific package. CoreDNS falls
-into this bucket.
-
-As i"m putting this together, **each layer is probably going to have templated
-fields** that I'd like to keep in a values file, and verify with a values
-schema file. Each layer ends up being composed of a schema + values + template
-file. Each of these can, and should get rendered independent of one
-another. **A lower layer shouldn't have any knowledge of layers that will
-be overlayed on top of it**.
-
-## Overlays
-
-The ultimate file is a composition of these layers on top of one another,
-ultimately ending up at the final image definition. I'd like to be able to
-overlay them with descending precedence:
-
-`workload > common > base`
-
-I will also need the ability to annotate my desired merging behavior sometimes
-on an array node basis, i.e. concat array items, concat array items but drop
-any duplication (this is effectively a set) etc.
-
-# Problems & Questions
-
-* First of all, am I thinking about this in the correct manner? I do NOT want
-to "fight the framework", so I'd like to do this in the idiomatic ytt manner.
-* It's not clear to me what order these files should be passed when running
-the command; should I be passing all schemas in order, then all values, then
-all the templates, or should I be passing schema > values > template in order
-of each layer?
-* I'm getting errors either way, but currently I'm attempting to render each
-"triplicate" in order of least specific to most specific. I'm running into
-the following error with this approach:
+This is done by invoking a Makefile target:
 
 ```
-# make coredns-manifest
-ytt \
-        -f base/schema/distro.yml \
-        -f base/values/alpine.distro.yml \
-        -f base/templates/distro.yml \
-        -f common/schema/common.yml \
-        -f common/values/alpine.common.yml \
-        -f common/templates/common.yml \
-        -f img/coredns/img.yml
-ytt: Error: Overlaying data values schema (in following order: distro.yml, common.yml):
-  Document on line common.yml:2:
-    Map item (key 'common_packages') on line common.yml:3:
-      Expected number of matched nodes to be 1, but was 0
-make: *** [Makefile:4: coredns-manifest] Error 1
-
+make <target>
 ```
 
-The details are in the linked project, but I suspect the issue here is it's
-trying to apply the aggregation of all the schemas first, and because the
-`distro.yml` file has none of the nodes that the `common.yml` schema declares
-it's producing the error. I'm not sure about this though since the error
-is really quite opaque. I'm also not certain I have a grasp over the ytt
-fundamentals at a depth that's required to accomplish what I'm trying to do.
-However, as mentioned before, there's no reason that I should have higher layers
-bleed their information into lower layers; the entire point is for a lower
-layer to have no knowledge over what's getting layered on top of it.
+Each target invokes `ytt` that...
 
-I'm 99% sure that ytt is the right tool for this job, I'm just hitting a wall
-trying to wrap my head around the "right" manner to do it. Is someone able
-to point me in the right direction? TYIA.
+1. renders an "image" (see `config/schema.yml:/image`)
+2. overlays a "distro" configuration (see `config/schema.yml:/distro`)
+3. overlays zero or more "package sets" (see `config/schema.yml:/package_sets`)
+
+The target identifies configuration for each layer by including the corresponding `ytt` Data Values file:
+
+- `values/image/`
+- `values/distro/`
+- `values/package-sets/`  
+
+For example:
+
+```Makefile
+coredns:
+	ytt -f config \
+		-f values/distro/alpine-3.20.yml \
+		-f values/image/coredns.yml \
+		-f values/package-sets/common.yml
+```
+where:
+- `-f config` includes the `ytt` library that templates and overlays the YAML fragments
+- `-f values/` entries name Data Values files that set the configuration for each layer
+
+## How to ...
+
+### How to declare a new LXC image manifest
+
+1. Define image-specific details in a Data Values file: 
+
+   Add a new `ytt` Data Values file in `values/image/` (see `config/schema.yml:/image` for the schema).
+
+   For example, to define the base manifest for an Nginx server:
+   ```yaml
+   #! values/image/nginx.yml
+   #@data/values
+   ---
+   image:
+     name: nginx
+     description: Defacto standard web server
+     packages:
+       - nginx
+   ```
+
+2. Define a new build target, using the new image:
+
+   Add a new **Makefile target** that names the new image **Data Value**s file.
+
+   ```Makefile
+   nginx:
+     ytt -f config \
+       -f values/distro/alpine-3.20.yml \
+       -f values/image/nginx.yml
+   ```
+   _(Stating the obvious: we need to include a distribution must in order to produce a complete LXC image manifest; in this example, Alpine Linux 3.20 is used.)_
+
+### How to add a brand new distro
+
+1. Define the distro in the "distro" `ytt` Library:
+
+   Add a new `ytt` Data Values file in `config/_ytt_lib/distro/definitions/` (see `.../distro/schema.yml:/distro_definitions` for the schema)
+
+   For example, to define Linux 21:
+   ```yaml
+   #! config/_ytt_lib/distro/definitions/mint.yml
+   #@data/values
+   ---
+   distro_definitions:
+     - distribution: mint
+       source:
+         downloader: debian
+         url: http://packages.linuxmint.com/
+         keys:
+           - 9F8A7B6C5D4E3F2A1B0C9D8E7F6A5B4C3D2E1F0A
+       package_manager: apt
+   ```
+
+2. For each version you would want to reference, add a Data Values file selecting the distro and giving the version.
+
+   Add a new `ytt` Data Values file in `values/distro/` (see `config/schema.yml:/distro` for the schema):
+
+   ```yaml
+   #! values/distro/mint-21.yml
+   #@data/values
+   ---
+   distro:
+    name: mint
+    release: "21"
+   ```
+
+3. In a build target, reference the new distro:
+
+   ```Makefile
+   nginx:
+     ytt -f config \
+       -f values/distro/mint-21.yml \
+       -f values/image/nginx.yml
+   ```
+
+### How to add a new version of an existing distro
+
+1. Add a new Data Values file in `values/distro/` (see `config/schema.yml:/distro` for the schema):
+
+   ```yaml
+   #! values/distro/mint-20.yml
+   #@data/values
+   ---
+   distro:
+     name: mint
+     release: "20"
+   ```
+
+2. In a build target, reference the new distro:
+
+   ```Makefile
+   nginx:
+     ytt -f config \
+       -f values/distro/mint-20.yml \
+       -f values/image/nginx.yml
+   ```
+
+### How to add a new package set
+
+1. Define the package set in the "package-sets" `ytt` Library:
+
+   Add a new `ytt` Data Values file in `config/_ytt_lib/package-sets/definitions/` (see `.../package-sets/schema.yml:/package_set_definitions` for the schema)
+
+   For example, to define a package set for network debugging tools:
+   ```yaml
+   #! config/_ytt_lib/package-sets/definitions/network-debugging.yml
+   #@data/values
+   ---
+   package_set_definitions:
+     - name: network-debugging
+       description: Network debugging tools
+       packages:
+         - tcpdump
+         - wireshark
+   ```
+
+2. Add a new Data Values file in `values/package-sets/` (see `config/schema.yml:/package_sets` for the schema):
+
+   ```yaml
+   #! values/package-sets/network-debugging.yml
+   #@data/values
+   ---
+   package_sets:
+     - name: network-debugging
+   ```
+
+3. In a build target, reference the new package set:
+
+   ```Makefile
+   nginx:
+     ytt -f config \
+       -f values/distro/mint-21.yml \
+       -f values/image/nginx.yml \
+       -f values/package-sets/network-debugging.yml
+   ```
+

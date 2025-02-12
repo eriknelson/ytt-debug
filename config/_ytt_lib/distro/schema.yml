@@ -1,0 +1,21 @@
+#@data/values-schema
+---
+#@schema/validation min_len=1
+distribution: ""
+#@schema/validation min_len=1
+release: ""
+#@schema/validation min_len=1
+variant: "default"
+#@schema/validation min_len=1
+architecture: ""
+
+#! list of distributions defined in this library
+distro_definitions:
+  - distribution: ""
+    source:
+      downloader: ""
+      url: ""
+      keys:
+        - ""
+    package_manager: ""
+

@@ -1,0 +1,7 @@
+#@data/values
+---
+image:
+  name: primaris-haproxy
+  description: HAProxy server for Primaris infrastructure
+  packages:
+    - haproxy
