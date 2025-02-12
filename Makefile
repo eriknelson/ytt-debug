@@ -1,23 +1,29 @@
 .PHONY: coredns-img
 
-coredns-manifest:
+DISTRO := alpine
+BUILD_DIR := _build
+
+coredns-manifest: common-manifest
 	ytt \
-		-f base/schema/distro.yml \
-		-f base/values/alpine.distro.yml \
-		-f base/templates/distro.yml \
-		-f common/schema/common.yml \
-		-f common/values/alpine.common.yml \
-		-f common/templates/common.yml \
-		-f img/coredns/img.yml
+		-f ${BUILD_DIR}/common.yml \
+		-f ytt-shared/ \
+		-f img/coredns/ \
+		> ${BUILD_DIR}/coredns.yml
 
-_common-manifest:
-	@ytt \
-		-f common/schema/common.yml \
-		-f common/values/alpine.common.yml \
-		-f common/templates/common.yml
+common-manifest: base-manifest
+	ytt \
+		-f ${BUILD_DIR}/base.yml \
+		-f ytt-shared/ \
+		-f common/config \
+		-f common/values/$(DISTRO).common.yml \
+		> ${BUILD_DIR}/common.yml
 
-_base-manifest:
-	@ytt \
-		-f base/schema/distro.yml \
-		-f base/values/alpine.distro.yml \
-		-f base/templates/distro.yml
+base-manifest:
+	mkdir -p ${BUILD_DIR}
+	ytt \
+		-f base/config \
+		-f base/values/$(DISTRO).distro.yml \
+		> ${BUILD_DIR}/base.yml
+
+clean:
+	rm -rf _build

@@ -1,0 +1,41 @@
+#! packages.lib.yml 
+#@ load("@ytt:overlay", "overlay")
+---
+
+#! package_set() yields a YAML Fragment of a mapping for one Package Set as described in:
+#!    https://github.com/lxc/distrobuilder/blob/7ff54966a579221644062b85b3689057e6899217/doc/examples/scheme.yaml#L134-L159
+#!   
+#@ def package_set(packages=[], action="install", flags=[], architectures=[], releases=[], types=[], variants=[], early=False):
+packages: #@ _add_if_missing(packages)
+action: #@ action
+
+#@ if/end flags:
+flags: #@ flags
+
+#@ if/end architectures:
+architectures: #@ architectures
+
+#@ if/end releases:
+releases: #@ releases
+
+#@ if/end types:
+types: #@ types
+
+#@ if/end variants:
+variants: #@ variants
+
+#@ if/end early:
+early: #@ early
+#@ end
+
+
+#! The following YAML document start literal (i.e. `---`) is needed to keep this template a valid YAML document.
+#! To prove this to yourself, remove all the lines in this file that start with `#` and consider whether what remains is a valid YAML document.
+---
+#! _add_if_missing() yields an array of package names, each annotated to either match the package name (if it exists) or append (if it is missing)
+#@ def _add_if_missing(packages):
+#@ for package in packages:
+#@overlay/match by=overlay.subset(package), missing_ok=True
+- #@ package
+#@ end
+#@ end
